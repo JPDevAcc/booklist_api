@@ -1,66 +1,32 @@
-import createError from 'http-errors' ;
+export const booklist = [] ;
 
-let booklist = []
-let idNo = 0
-
-export function index(req, res) {
-	res.send(booklist)
+// TODO: REMOVE THIS WHEN DATABASE FUNCTIONALITY IMPLEMENTED!
+const USE_TEST_DATA = true ;
+if (USE_TEST_DATA) {
+	booklist[0] =
+	{
+		id: 1,
+		"title": "SomeTitle",
+		"author": "SomeOtherAuthor",
+		"read": false,
+	}
+	booklist[1] =
+	{
+		id: 2,
+		"title": "SomeOtherTitle",
+		"author": "SomeAuthor",
+		"read": false
+	}
+	booklist[2] =
+	{
+		id: 3,
+		"title": "SomeOtherTitleStill",
+		"author": "SomeAuthor",
+		"read": false
+	}
 }
 
-export function create(req, res, next) {
-	if (!req.body.title) {
-        return (next(createError(400, 'Title is required')))
-    }
+import * as main from './bookControllerMain.mjs' ;
+import * as search from './bookControllerSearch.mjs' ;
 
-    booklist.push({
-        id: idNo,
-        title: req.body.title,
-        read: false,
-        author: req.body.author
-    })
-    idNo++
-    res.send({
-        result: true
-    })
-}
-
-export function show(req, res, next) {
-	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
-    res.send(booklistItem)
-}
-
-export function remove(req, res, next) {
-	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
-
-    booklist = booklist.filter(bookList => bookList.id != req.params.id)
-    res.send({
-        result: true
-    })
-}
-
-export function update(req, res, next) {
-	if (!req.body.title) {
-        return (next(createError(400, 'Title is required')))
-    }
-    const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
-
-    booklist = booklist.map(bookList => {
-        if (bookList.id == req.params.id) {
-            bookList.title = req.body.title
-        }
-        return bookList
-    })
-
-    res.send({
-        result: true
-    })
-}
+export {main, search} ;
