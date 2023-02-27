@@ -7,13 +7,22 @@ if (USE_TEST_DATA) {
 	{
 		id: 1,
 		"title": "SomeTitle",
-		"author": "SomeOtherAuthor"
+		"author": "SomeOtherAuthor",
+		"read": false,
 	}
 	booklist[1] =
 	{
 		id: 2,
 		"title": "SomeOtherTitle",
-		"author": "SomeAuthor"
+		"author": "SomeAuthor",
+		"read": false
+	}
+	booklist[2] =
+	{
+		id: 3,
+		"title": "SomeOtherTitleStill",
+		"author": "SomeAuthor",
+		"read": false
 	}
 }
 

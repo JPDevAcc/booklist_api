@@ -1,7 +1,7 @@
 import createError from 'http-errors' ;
 
 import { booklist } from './bookController.mjs' ;
-let idNo = 0
+let idNo = 4 ; // One or length of test-data + 1
 
 export function index(req, res) {
 	res.send(booklist)
