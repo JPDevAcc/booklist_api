@@ -3,11 +3,12 @@ import * as booklist from "./bookController.mjs"
 const router = express.Router() ;
 
 // Routes
-router.get('/booklist/:id', booklist.show) ;
-router.get("/booklist", booklist.index) ;
-router.post("/create", booklist.create) ;
-router.delete("/delete/:id", booklist.remove) ;
-router.put("/booklist/:id", booklist.update) ;
+router.get('/booklist/:id', booklist.main.show) ;
+router.get("/booklist", booklist.main.index) ;
+router.post("/create", booklist.main.create) ;
+router.delete("/delete/:id", booklist.main.remove) ;
+router.put("/booklist/:id", booklist.main.update) ; // (this might need to have 'create' in the url to work on render deployment)
+router.get("/booklist/search/:op", booklist.search.findBooksBy) ;
 
 /*
 // (for some reason these only work locally - not on render deployments)
