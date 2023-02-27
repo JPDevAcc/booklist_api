@@ -7,7 +7,7 @@ router.get('/booklist/:id', booklist.main.show) ;
 router.get("/booklist", booklist.main.index) ;
 router.post("/create", booklist.main.create) ;
 router.delete("/delete/:id", booklist.main.remove) ;
-router.put("/booklist/:id", booklist.main.update) ; // (this might need to have 'create' in the url to work on render deployment)
+router.put("/booklist/:id", booklist.main.update) ; // (this might need to have 'update' in the url to work on render deployment)
 router.get("/booklist/search/:op", booklist.search.findBooksBy) ;
 
 /*
