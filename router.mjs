@@ -1,13 +1,13 @@
 import express from "express";
-import * as todos from "./todosController.mjs"
+import * as booklist from "./bookController.mjs"
 const router = express.Router() ;
 
 // Routes
-router.get('/todo/:id', todos.show) ;
-router.get("/todo", todos.index) ;
-router.post("/create", todos.create) ;
-router.delete("/delete/:id", todos.remove) ;
-router.put("/todo/:id", todos.update) ;
+router.get('/booklist/:id', booklist.show) ;
+router.get("/booklist", booklist.index) ;
+router.post("/create", booklist.create) ;
+router.delete("/delete/:id", booklist.remove) ;
+router.put("/booklist/:id", booklist.update) ;
 
 /*
 // (for some reason these only work locally - not on render deployments)
