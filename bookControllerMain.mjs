@@ -115,3 +115,18 @@ export function update(req, res, next) {
         return (next(createError(400, "Something went wrong! Oh no!")));
     })
 };
+
+////use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
+export function bookburn(req, res, next) {
+    Book.deleteMany({ author: req.params.author })
+        .then((book) => {
+            if (book.deletedCount) {
+                return res.send({ result: true });
+            } else {
+                return next(createError(404, "No books by this author were found"));
+            }
+        })
+        .catch(() => {
+            return next(createError(400, "Something went wrong! Oh no!"));
+        });
+}
