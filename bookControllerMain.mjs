@@ -1,66 +1,117 @@
-import createError from 'http-errors' ;
-
-import { booklist } from './bookController.mjs' ;
-let idNo = 4 ; // One or length of test-data + 1
+import createError from 'http-errors';
+import Book from './models/book.mjs';
+import { ObjectId } from 'mongoose';
 
 export function index(req, res) {
-	res.send(booklist)
+    Book.find()
+    .then((book) => {
+        res.send(book)
+    })
 }
+
+// export function create(req, res, next) {
+// 	if (!req.body.title) {
+//         return (next(createError(400, 'Title is required')))
+//     }
+
+//     booklist.push({
+//         id: idNo,
+//         title: req.body.title,
+//         read: false,
+//         author: req.body.author
+//     })
+//     idNo++
+//     res.send({
+//         result: true
+//     })
+// }
 
 export function create(req, res, next) {
-	if (!req.body.title) {
+    if (!req.body.title) {
         return (next(createError(400, 'Title is required')))
     }
 
-    booklist.push({
-        id: idNo,
+    const book = new Book({
         title: req.body.title,
-        read: false,
-        author: req.body.author
+        author: req.body.author,
+        read: false
+    });
+
+    book.save().then(book => {
+        if (book) res.send(book);
+    }).catch(() => {
+        return (next(createError(400, "Some error!")));
     })
-    idNo++
-    res.send({
-        result: true
-    })
-}
+};
+
+// export function show(req, res, next) {
+// 	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
+//     if (!booklistItem) {
+//         return (next(createError(404, "Booklist item not found")))
+//     }
+//     res.send(booklistItem)
+// }
 
 export function show(req, res, next) {
-	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
-    res.send(booklistItem)
-}
+    Book.findById(req.params.id).then((book) => {
+        if (!book) return (next(createError(404, "Booklist item not found")));
+        res.send(book);
+    }).catch(() => {
+        return (next(createError(400, "Something went wrong! Oh no!")));
+    })
+};
+
+// export function remove(req, res, next) {
+// 	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
+//     if (!booklistItem) {
+//         return (next(createError(404, "Booklist item not found")))
+//     }
+
+//     filterInPlace(booklist, booklist => booklist.id != req.params.id) ;
+//     res.send({
+//         result: true
+//     })
+// }
 
 export function remove(req, res, next) {
-	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
+    Book.deleteOne({ _id: (req.params.id) })
+        .then((book) => {
+            if (book.deletedCount) {
+                return res.send({ result: true })
+            } 
+            return (next(createError(400, "Book doesn't exist")));
+        }).catch(() => {
+            return (next(createError(400, "Something went wrong! Oh no!")));
+        })
+};
 
-    filterInPlace(booklist, booklist => booklist.id != req.params.id) ;
-    res.send({
-        result: true
-    })
-}
+// export function update(req, res, next) {
+//     if (!req.body.title) {
+//         return (next(createError(400, 'Title is required')))
+//     }
+//     console.log(booklist, req.params.id);
+//     const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
+//     if (!booklistItem) {
+//         return (next(createError(404, "Booklist item not found")))
+//     }
+
+//     booklistItem.title = req.body.title;
+
+//     res.send({
+//         result: true
+//     })
+// }
 
 export function update(req, res, next) {
-	if (!req.body.title) {
+    if (!req.body.title) {
         return (next(createError(400, 'Title is required')))
     }
-		console.log(booklist, req.params.id) ;
-    const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-    if (!booklistItem) {
-        return (next(createError(404, "Booklist item not found")))
-    }
-
-		booklistItem.title = req.body.title ;
-
-    res.send({
-        result: true
+    Book.findById(req.params.id).then((book) => {
+        if (!book) return (next(createError(404, "Booklist item not found")));
+        book.title = req.body.title
+        book.author = req.body.author
+        book.save().then(() => res.send({ result: true }))
+    }).catch(() => {
+        return (next(createError(400, "Something went wrong! Oh no!")));
     })
-}
-
-function filterInPlace(arr, callback) {
-	return arr.splice(0, arr.length, ...arr.filter(callback)) ;
-}
+};
