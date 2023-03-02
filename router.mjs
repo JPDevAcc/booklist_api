@@ -10,6 +10,7 @@ router.get('/booklist/:id', booklist.main.show) ;
 router.post("/create", booklist.main.create) ;
 router.delete("/delete/:id", booklist.main.remove) ;
 router.put("/booklist/:id", booklist.main.update) ; // (this might need to have 'update' in the url to work on render deployment)
+router.patch("/booklist/isread/:id", booklist.main.setReadStatus) ;
 router.get("/booklist/search/:op", booklist.search.findBooksBy) ;
 router.delete("/burn/:author", booklist.main.bookburn) ; // replace spaces in url with %20
 
