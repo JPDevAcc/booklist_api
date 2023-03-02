@@ -139,6 +139,21 @@ export function update(req, res, next) {
     })
 };
 
+// Set the read/unread status for the specified book
+export async function setReadStatus(req, res, next) {
+	if (req.body.read === undefined) return (next(createError(400, 'Read status is required')))
+	try {
+		const book = await Book.findById(req.params.id) ;
+		if (!book) return (next(createError(404, "Booklist item not found")));
+		book.read = req.body.read
+		await book.save() ;
+		res.send({ result: true }) ;
+	}
+	catch {
+		return (next(createError(400, "Something went wrong! Oh no!")));
+	}
+}
+
 ////use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
 export function bookburn(req, res, next) {
     Book.deleteMany({ author: req.params.author })
