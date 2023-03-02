@@ -2,11 +2,34 @@ import createError from 'http-errors';
 import Book from './models/book.mjs';
 import { ObjectId } from 'mongoose';
 
+// Respond with number of records
+export async function count(req, res, next) {
+	try {
+		return res.send({count: await Book.count()}) ;
+	}
+	catch(err) {
+		console.log("Error:", err) ;
+		return next(createError(400, "Something went wrong! Oh no!"));
+	}
+}
+
 export function index(req, res) {
     Book.find()
     .then((book) => {
         res.send(book)
     })
+}
+
+// Respond with records in given range
+export async function indexRange(req, res, next) {
+	const limit = (req.params.indexEnd - req.params.indexStart) ;
+	try {
+		return res.send(await Book.find().limit(limit).skip(req.params.indexStart)) ;
+	}
+	catch(err) {
+		console.log("Error:", err) ;
+		return next(createError(400, "Something went wrong! Oh no!"));
+	}
 }
 
 // export function create(req, res, next) {
