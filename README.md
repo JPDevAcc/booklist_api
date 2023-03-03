@@ -1,4 +1,4 @@
-"# booklist_api" 
+# booklist_api
 
 A group project to create an API in Node/Express for accessing and modifying a book-list (containing title, author, and read/unread status), with MongoDB used for the database.
 
