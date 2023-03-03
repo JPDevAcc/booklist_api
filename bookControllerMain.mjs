@@ -1,8 +1,7 @@
 import createError from 'http-errors';
 import Book from './models/book.mjs';
-import { ObjectId } from 'mongoose';
 
-// Respond with number of records
+// Retrieve number of records
 export async function count(req, res, next) {
 	try {
 		return res.send({count: await Book.count()}) ;
@@ -13,6 +12,7 @@ export async function count(req, res, next) {
 	}
 }
 
+// Retrieve all books
 export function index(req, res) {
     Book.find()
     .then((book) => {
@@ -20,7 +20,7 @@ export function index(req, res) {
     })
 }
 
-// Respond with records in given range
+// Retrieve books in given range by start and end index
 export async function indexRange(req, res, next) {
 	const limit = (req.params.indexEnd - req.params.indexStart) ;
 	try {
@@ -32,26 +32,13 @@ export async function indexRange(req, res, next) {
 	}
 }
 
-// export function create(req, res, next) {
-// 	if (!req.body.title) {
-//         return (next(createError(400, 'Title is required')))
-//     }
-
-//     booklist.push({
-//         id: idNo,
-//         title: req.body.title,
-//         read: false,
-//         author: req.body.author
-//     })
-//     idNo++
-//     res.send({
-//         result: true
-//     })
-// }
-
+// Create new book entry
 export function create(req, res, next) {
     if (!req.body.title) {
-        return (next(createError(400, 'Title is required')))
+      return (next(createError(400, 'Title is required')))
+    }
+		if (!req.body.author) {
+      return (next(createError(400, 'Author is required')))
     }
 
     const book = new Book({
@@ -63,18 +50,11 @@ export function create(req, res, next) {
     book.save().then(book => {
         if (book) res.send(book);
     }).catch(() => {
-        return (next(createError(400, "Some error!")));
+        return (next(createError(400, "Something went wrong! Oh no!")));
     })
 };
 
-// export function show(req, res, next) {
-// 	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-//     if (!booklistItem) {
-//         return (next(createError(404, "Booklist item not found")))
-//     }
-//     res.send(booklistItem)
-// }
-
+// Return book by id
 export function show(req, res, next) {
     Book.findById(req.params.id).then((book) => {
         if (!book) return (next(createError(404, "Booklist item not found")));
@@ -84,50 +64,26 @@ export function show(req, res, next) {
     })
 };
 
-// export function remove(req, res, next) {
-// 	const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-//     if (!booklistItem) {
-//         return (next(createError(404, "Booklist item not found")))
-//     }
-
-//     filterInPlace(booklist, booklist => booklist.id != req.params.id) ;
-//     res.send({
-//         result: true
-//     })
-// }
-
+// Remove a book by id
 export function remove(req, res, next) {
     Book.deleteOne({ _id: (req.params.id) })
         .then((book) => {
             if (book.deletedCount) {
                 return res.send({ result: true })
             } 
-            return (next(createError(400, "Book doesn't exist")));
+            return (next(createError(404, "Book doesn't exist")));
         }).catch(() => {
             return (next(createError(400, "Something went wrong! Oh no!")));
         })
 };
 
-// export function update(req, res, next) {
-//     if (!req.body.title) {
-//         return (next(createError(400, 'Title is required')))
-//     }
-//     console.log(booklist, req.params.id);
-//     const booklistItem = booklist.find(bookList => bookList.id == req.params.id)
-//     if (!booklistItem) {
-//         return (next(createError(404, "Booklist item not found")))
-//     }
-
-//     booklistItem.title = req.body.title;
-
-//     res.send({
-//         result: true
-//     })
-// }
-
+// Update title and author by id
 export function update(req, res, next) {
     if (!req.body.title) {
-        return (next(createError(400, 'Title is required')))
+      return (next(createError(400, 'Title is required')))
+    }
+		if (!req.body.author) {
+      return (next(createError(400, 'Author is required')))
     }
     Book.findById(req.params.id).then((book) => {
         if (!book) return (next(createError(404, "Booklist item not found")));
@@ -139,7 +95,7 @@ export function update(req, res, next) {
     })
 };
 
-// Set the read/unread status for the specified book
+// Set the read/unread status by id
 export async function setReadStatus(req, res, next) {
 	if (req.body.read === undefined) return (next(createError(400, 'Read status is required')))
 	try {
@@ -154,7 +110,7 @@ export async function setReadStatus(req, res, next) {
 	}
 }
 
-////use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
+// "Burn" books by the specified author | use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
 export function bookburn(req, res, next) {
     Book.deleteMany({ author: req.params.author })
         .then((book) => {
