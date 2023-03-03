@@ -16,12 +16,21 @@ Extensions:
 Endpoints:
 
 [GET] /booklist/count
+
 [GET] /booklist
+
 [GET] /booklist/range/:indexStart/:indexEnd
+
 [GET] /booklist/:id
+
 [POST] /create (body = title:String, author:String)
+
 [DELETE] /delete/:id
+
 [PUT] /booklist/:id (body = title:String, author:String)
+
 [PATCH] /booklist/isread/:id (body = read:Boolean)
+
 [GET] /booklist/search/:op
+
 [DELETE] /burn/:author
