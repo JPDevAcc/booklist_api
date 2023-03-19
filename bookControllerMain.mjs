@@ -1,6 +1,8 @@
 import createError from 'http-errors';
 import Book from './models/book.mjs';
 
+const disableRiskyModifications = (process.env.DISABLE_RISKY_MODIFICATIONS !== 'false') ;
+
 // Retrieve number of records
 export async function count(req, res, next) {
 	try {
@@ -47,6 +49,8 @@ export function create(req, res, next) {
         read: false
     });
 
+		if (disableRiskyModifications) return res.send(book) ;
+
     book.save().then(book => {
         if (book) res.send(book);
     }).catch(() => {
@@ -66,6 +70,8 @@ export function show(req, res, next) {
 
 // Remove a book by id
 export function remove(req, res, next) {
+	if (disableRiskyModifications) return res.send({ result: true }) ;
+
     Book.deleteOne({ _id: (req.params.id) })
         .then((book) => {
             if (book.deletedCount) {
@@ -87,6 +93,9 @@ export function update(req, res, next) {
     }
     Book.findById(req.params.id).then((book) => {
         if (!book) return (next(createError(404, "Booklist item not found")));
+				
+				if (disableRiskyModifications) return res.send({ result: true }) ;
+
         book.title = req.body.title
         book.author = req.body.author
         book.save().then(() => res.send({ result: true }))
@@ -112,6 +121,8 @@ export async function setReadStatus(req, res, next) {
 
 // "Burn" books by the specified author | use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
 export function bookburn(req, res, next) {
+	if (disableRiskyModifications) return res.send({ result: true }) ;
+	
     Book.deleteMany({ author: req.params.author })
         .then((book) => {
             if (book.deletedCount) {
