@@ -1,10 +1,10 @@
 import createError from 'http-errors';
-import Book from './models/book.mjs';
-
-const disableRiskyModifications = (process.env.DISABLE_RISKY_MODIFICATIONS !== 'false') ;
+import getBookModel from './models/book.mjs';
 
 // Retrieve number of records
 export async function count(req, res, next) {
+	const Book = getBookModel() ;
+	
 	try {
 		return res.send({count: await Book.count()}) ;
 	}
@@ -16,6 +16,8 @@ export async function count(req, res, next) {
 
 // Retrieve all books
 export function index(req, res) {
+		const Book = getBookModel() ;
+
     Book.find()
     .then((book) => {
         res.send(book)
@@ -24,6 +26,8 @@ export function index(req, res) {
 
 // Retrieve books in given range by start and end index
 export async function indexRange(req, res, next) {
+	const Book = getBookModel() ;
+
 	const limit = (req.params.indexEnd - req.params.indexStart) ;
 	try {
 		return res.send(await Book.find().limit(limit).skip(req.params.indexStart)) ;
@@ -36,6 +40,8 @@ export async function indexRange(req, res, next) {
 
 // Create new book entry
 export function create(req, res, next) {
+		const Book = getBookModel() ;
+
     if (!req.body.title) {
       return (next(createError(400, 'Title is required')))
     }
@@ -49,8 +55,6 @@ export function create(req, res, next) {
         read: false
     });
 
-		if (disableRiskyModifications) return res.send(book) ;
-
     book.save().then(book => {
         if (book) res.send(book);
     }).catch(() => {
@@ -60,6 +64,8 @@ export function create(req, res, next) {
 
 // Return book by id
 export function show(req, res, next) {
+		const Book = getBookModel() ;
+
     Book.findById(req.params.id).then((book) => {
         if (!book) return (next(createError(404, "Booklist item not found")));
         res.send(book);
@@ -70,7 +76,7 @@ export function show(req, res, next) {
 
 // Remove a book by id
 export function remove(req, res, next) {
-	if (disableRiskyModifications) return res.send({ result: true }) ;
+		const Book = getBookModel() ;
 
     Book.deleteOne({ _id: (req.params.id) })
         .then((book) => {
@@ -85,6 +91,8 @@ export function remove(req, res, next) {
 
 // Update title and author by id
 export function update(req, res, next) {
+		const Book = getBookModel() ;
+
     if (!req.body.title) {
       return (next(createError(400, 'Title is required')))
     }
@@ -93,8 +101,6 @@ export function update(req, res, next) {
     }
     Book.findById(req.params.id).then((book) => {
         if (!book) return (next(createError(404, "Booklist item not found")));
-				
-				if (disableRiskyModifications) return res.send({ result: true }) ;
 
         book.title = req.body.title
         book.author = req.body.author
@@ -106,6 +112,8 @@ export function update(req, res, next) {
 
 // Set the read/unread status by id
 export async function setReadStatus(req, res, next) {
+	const Book = getBookModel() ;
+
 	if (req.body.read === undefined) return (next(createError(400, 'Read status is required')))
 	try {
 		const book = await Book.findById(req.params.id) ;
@@ -121,17 +129,17 @@ export async function setReadStatus(req, res, next) {
 
 // "Burn" books by the specified author | use sparingly - this will delete all books by a given author (put %20 in place of spaces in url)
 export function bookburn(req, res, next) {
-	if (disableRiskyModifications) return res.send({ result: true }) ;
-	
-    Book.deleteMany({ author: req.params.author })
-        .then((book) => {
-            if (book.deletedCount) {
-                return res.send({ result: true });
-            } else {
-                return next(createError(404, "No books by this author were found"));
-            }
-        })
-        .catch(() => {
-            return next(createError(400, "Something went wrong! Oh no!"));
-        });
+	const Book = getBookModel() ;
+
+	Book.deleteMany({ author: req.params.author })
+	.then((book) => {
+		if (book.deletedCount) {
+			return res.send({ result: true });
+		} else {
+			return next(createError(404, "No books by this author were found"));
+		}
+	})
+	.catch(() => {
+		return next(createError(400, "Something went wrong! Oh no!"));
+	});
 }
