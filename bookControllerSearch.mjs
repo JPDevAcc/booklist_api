@@ -1,9 +1,11 @@
 import createError from 'http-errors' ;
-import Book from './models/book.mjs';
+import getBookModel from './models/book.mjs';
 
 // Return matching books according to given criteria
 /* URL format: /[or|and]?f1=fieldName1&s1=searchValue1&f2=fieldName2&s2=searchValue2... */
 export async function findBooksBy(req, res, next) {
+	const Book = getBookModel() ;
+
 	// Get just the query values (i.e. only the order matters, not the parameter names themselves)
 	const queryValues = Object.values(req.query) ;
 

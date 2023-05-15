@@ -6,5 +6,7 @@ const bookSchema = Schema({
 	read: Boolean
 })
 
-const Book = model("Book", bookSchema) ;
-export default Book ;
+export { bookSchema };
+
+const getModel = () => model(global.userCollectionsPrefix + 'Book', bookSchema) ;
+export default getModel ;

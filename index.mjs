@@ -3,15 +3,32 @@ import express from "express";
 import router from "./router.mjs" ;
 import cors from "cors";
 import mongoose from "mongoose";
+import cookieParser from 'cookie-parser';
+import databaseIsolation from "./databaseIsolation.mjs";
 
 // Init dotenv
 config() ;
 
 // Express setup + middleware stack
 const app = express() ;
-app.use(cors()) ;
+
+// CORS
+const corsOptions = {
+  origin: true,
+  credentials: true
+};
+app.use(cors(corsOptions));
+
+// Other middleware
 app.use(express.json()) ;
 app.use(express.urlencoded({ extended: false })) ;
+app.use(cookieParser()) ;
+
+// Database collection isolation
+if (process.env.ENABLE_DB_ISOLATION === 'true') app.use(databaseIsolation) ;
+else global.userCollectionsPrefix = '' ;
+console.log("Database collection isolation is:", (process.env.ENABLE_DB_ISOLATION === 'true') ? 'ENABLED' : 'DISABLED') ;
+
 app.use(router) ;
 
 // Connect to DB
@@ -23,7 +40,7 @@ mongoose.connect(process.env.DBURI, {
 // Database event handling
 const db = mongoose.connection ;
 db.on('error', console.error.bind(console, 'connection error:')) ; // Log connection errors
-db.once('open', () => console.log("Datatbase connected")) ; // Open the connection
+db.once('open', () => console.log("Database connected")) ; // Open the connection
 
 // Listen for connections
 const port = process.env.PORT || 3000 ;
